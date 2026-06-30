@@ -51,6 +51,12 @@
           <label class="block text-sm font-medium text-slate-300">Move name</label>
           <input id="moveTitle" type="text" placeholder="Knee Bar" required class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none transition focus:border-sky-400" />
         </div>
+        <div class="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3">
+          <label class="flex items-center gap-3 text-sm font-medium text-slate-300">
+            <input id="subPositionToggle" type="checkbox" class="h-4 w-4 rounded border-slate-600 bg-slate-950 text-sky-500 focus:ring-sky-500" />
+            <span>Add Sub-Position</span>
+          </label>
+        </div>
         <div>
           <label class="block text-sm font-medium text-slate-300">Position</label>
           <select id="movePosition" required class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none transition focus:border-sky-400">
@@ -263,32 +269,37 @@
 
   <template id="moveCardTemplate">
     <article class="move-card glass rounded-3xl border border-slate-700 shadow-xl shadow-slate-900/20">
-      <button type="button" class="move-summary w-full rounded-3xl bg-slate-900/80 p-4 text-left transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="min-w-0">
-            <div class="flex flex-wrap items-center gap-2">
-              <h2 class="title min-w-0 text-lg font-semibold text-white truncate"></h2>
-              <p class="role-tag rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300"></p>
-              <span class="position-badge inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]"></span>
+      <div class="flex items-center gap-2 rounded-3xl bg-slate-900/80 p-4">
+        <button type="button" class="move-summary flex-1 rounded-2xl text-left transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="title min-w-0 text-lg font-semibold text-white truncate"></h2>
+                <p class="role-tag rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300"></p>
+                <span class="position-badge inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]"></span>
+              </div>
+            </div>
+            <div class="stats-summary flex flex-wrap items-center gap-3">
+              <div class="text-right">
+                <p class="text-[10px] uppercase tracking-[0.24em] text-slate-400">Attempts</p>
+                <p class="attempts text-xl font-semibold text-white">0</p>
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] uppercase tracking-[0.24em] text-slate-400">Successes</p>
+                <p class="successes text-xl font-semibold text-white">0</p>
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] uppercase tracking-[0.24em] text-slate-400">Success</p>
+                <p class="summary-rate text-xl font-semibold text-sky-300">0%</p>
+              </div>
+              <svg class="chevron-icon h-5 w-5 text-slate-400 transition-transform" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
           </div>
-          <div class="flex flex-wrap items-center gap-3">
-            <div class="text-right">
-              <p class="text-[10px] uppercase tracking-[0.24em] text-slate-400">Attempts</p>
-              <p class="attempts text-xl font-semibold text-white">0</p>
-            </div>
-            <div class="text-right">
-              <p class="text-[10px] uppercase tracking-[0.24em] text-slate-400">Successes</p>
-              <p class="successes text-xl font-semibold text-white">0</p>
-            </div>
-            <div class="text-right">
-              <p class="text-[10px] uppercase tracking-[0.24em] text-slate-400">Success</p>
-              <p class="summary-rate text-xl font-semibold text-sky-300">0%</p>
-            </div>
-            <svg class="chevron-icon h-5 w-5 text-slate-400 transition-transform" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </div>
-      </button>
+        </button>
+        <button type="button" class="subposition-edit-btn hidden rounded-full border border-slate-700 bg-slate-800 p-2 text-slate-300 transition hover:border-sky-400 hover:text-sky-300" aria-label="Edit sub-position details">
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13.5V16h2.5l7.4-7.4-2.5-2.5L4 13.5z" stroke-linejoin="round"/><path d="M12.5 4.5l3 3" stroke-linecap="round"/></svg>
+        </button>
+      </div>
       <div class="details hidden border-t border-slate-700/60 px-4 py-4">
         <div class="mt-4 rounded-3xl bg-slate-900/80 p-4 space-y-4">
           <div>
@@ -321,14 +332,14 @@
               </label>
             </div>
           </div>
-          <div class="rounded-3xl bg-slate-900/80 p-4 space-y-4">
+          <div class="stats-panel rounded-3xl bg-slate-900/80 p-4 space-y-4">
             <div>
               <p class="text-sm uppercase tracking-[0.18em] text-slate-400">Success Rate</p>
               <p class="success-rate mt-2 text-3xl font-semibold">0%</p>
             </div>
           </div>
         </div>
-        <div class="mt-4 flex flex-wrap gap-3">
+        <div class="action-row mt-4 flex flex-wrap gap-3">
           <button class="attempt-btn rounded-2xl bg-slate-800 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">+1 Attempt</button>
           <button class="success-btn rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400">+1 Success</button>
           <button class="undo-btn rounded-2xl border border-sky-500 bg-slate-800 px-4 py-3 text-sm font-semibold text-sky-300 transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50">Undo</button>
@@ -343,10 +354,13 @@
     const moves = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     let actionHistory = [];
     const expandedMoves = new Set();
+    const expandedSubPositions = new Set();
+    const expandedSubPositionDetails = new Set();
     let collapsedCategories = new Set();
 
     const form = document.getElementById('moveForm');
     const titleInput = document.getElementById('moveTitle');
+    const subPositionToggle = document.getElementById('subPositionToggle');
     const positionInput = document.getElementById('movePosition');
     const roleInput = document.getElementById('moveRole');
     const transitionFromSelect = document.getElementById('transitionFrom');
@@ -937,13 +951,21 @@
           list.classList.add('hidden');
         }
 
-        const renderMove = (move, indent = false) => {
+        const renderMove = (move, indent = false, childMoves = [], targetContainer = list) => {
           const clone = template.content.cloneNode(true);
           const article = clone.querySelector('article');
           if (indent) {
             article.classList.add('ml-8', 'border-l', 'border-slate-700/40');
           }
           clone.querySelector('.title').textContent = move.title;
+          const statsSummary = clone.querySelector('.stats-summary');
+          const statsPanel = clone.querySelector('.stats-panel');
+          const actionRow = clone.querySelector('.action-row');
+          const isSubPosition = Boolean(move.isSubPosition);
+          const hasChildTransitions = isSubPosition && childMoves.length > 0;
+          statsSummary.classList.toggle('hidden', isSubPosition);
+          statsPanel.classList.toggle('hidden', isSubPosition);
+          actionRow.classList.toggle('hidden', isSubPosition);
           const badge = clone.querySelector('.position-badge');
           badge.textContent = move.position;
           badge.className = `position-badge inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${getBadgeClasses(move.position)}`;
@@ -1018,6 +1040,7 @@
 
           const summaryBtn = clone.querySelector('.move-summary');
           const detailsPanel = clone.querySelector('.details');
+          const subPositionEditBtn = clone.querySelector('.subposition-edit-btn');
           const chevron = clone.querySelector('.chevron-icon');
           const attemptBtn = clone.querySelector('.attempt-btn');
           const successBtn = clone.querySelector('.success-btn');
@@ -1027,7 +1050,34 @@
           const imageInput = clone.querySelector('.image-input');
           undoBtn.disabled = actionHistory.length === 0;
 
+          if (isSubPosition) {
+            subPositionEditBtn.classList.remove('hidden');
+          }
+
+          let childContainer = null;
+          if (hasChildTransitions) {
+            childContainer = document.createElement('div');
+            childContainer.className = 'sub-position-children mt-3 space-y-3 hidden';
+            summaryBtn.closest('.flex.items-center.gap-2')?.insertAdjacentElement('afterend', childContainer);
+            childMoves.forEach(child => {
+              renderMove(child, true, [], childContainer);
+            });
+          }
+
           const updateCardHighlight = () => {
+            if (isSubPosition) {
+              const expandedChildren = expandedSubPositions.has(move.id);
+              const expandedDetails = expandedSubPositionDetails.has(move.id);
+              if (hasChildTransitions) {
+                childContainer?.classList.toggle('hidden', !expandedChildren);
+              }
+              detailsPanel.classList.toggle('hidden', !expandedDetails);
+              chevron.style.transform = expandedChildren || expandedDetails ? 'rotate(180deg)' : 'rotate(0deg)';
+              article.classList.toggle('border-sky-500/60', expandedChildren || expandedDetails);
+              article.classList.toggle('shadow-sky-500/10', expandedChildren || expandedDetails);
+              return;
+            }
+
             const expanded = expandedMoves.has(move.id);
             detailsPanel.classList.toggle('hidden', !expanded);
             chevron.style.transform = expanded ? 'rotate(180deg)' : 'rotate(0deg)';
@@ -1038,10 +1088,31 @@
           updateCardHighlight();
 
           summaryBtn.addEventListener('click', () => {
+            if (isSubPosition) {
+              if (hasChildTransitions) {
+                if (expandedSubPositions.has(move.id)) {
+                  expandedSubPositions.delete(move.id);
+                } else {
+                  expandedSubPositions.add(move.id);
+                }
+              }
+              updateCardHighlight();
+              return;
+            }
             if (expandedMoves.has(move.id)) {
               expandedMoves.delete(move.id);
             } else {
               expandedMoves.add(move.id);
+            }
+            updateCardHighlight();
+          });
+
+          subPositionEditBtn.addEventListener('click', event => {
+            event.stopPropagation();
+            if (expandedSubPositionDetails.has(move.id)) {
+              expandedSubPositionDetails.delete(move.id);
+            } else {
+              expandedSubPositionDetails.add(move.id);
             }
             updateCardHighlight();
           });
@@ -1105,13 +1176,17 @@
             reader.readAsDataURL(file);
           });
 
-          list.appendChild(clone);
+          targetContainer.appendChild(clone);
         };
 
         group.mainMoves.forEach(move => {
-          renderMove(move, false);
-          const children = group.transitionMap.get(move.id) || [];
-          children.forEach(child => renderMove(child, true));
+          if (move.isSubPosition) {
+            renderMove(move, false, group.transitionMap.get(move.id) || []);
+          } else {
+            renderMove(move, false);
+            const children = group.transitionMap.get(move.id) || [];
+            children.forEach(child => renderMove(child, true));
+          }
         });
 
         group.orphanTransitions.forEach(transition => renderMove(transition, true));
@@ -1145,7 +1220,7 @@
       updateUndoState();
     }
 
-    function getNewMove(title, position, role, transitionFromId, giOnly, legEntanglementSide = '') {
+    function getNewMove(title, position, role, transitionFromId, giOnly, legEntanglementSide = '', isSubPosition = false) {
       return {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         title,
@@ -1155,6 +1230,7 @@
         role,
         transitionFromId: transitionFromId || '',
         giOnly: Boolean(giOnly),
+        isSubPosition: Boolean(isSubPosition),
         legEntanglementSide: ['Cross Ashi', '50/50'].includes(position) ? legEntanglementSide : '',
         origin: 'Modern BJJ',
         originOther: '',
@@ -1170,6 +1246,7 @@
       let role = roleInput.value;
       const transitionFromId = position === 'Transition' ? transitionFromSelect.value : '';
       const giOnly = giOnlyToggle.checked;
+      const isSubPosition = subPositionToggle.checked;
       const legEntanglementSide = ['Cross Ashi', '50/50'].includes(position) ? legEntanglementSideInput.value : '';
       if (!title) return;
       if (position === 'Transition' && !transitionFromId) return;
@@ -1179,11 +1256,12 @@
       if (position === 'Transition' || (position === '50/50' && legEntanglementSide === 'Frontside')) {
         role = '';
       }
-      moves.unshift(getNewMove(title, position, role, transitionFromId, giOnly, legEntanglementSide));
+      moves.unshift(getNewMove(title, position, role, transitionFromId, giOnly, legEntanglementSide, isSubPosition));
       saveData();
       renderCards();
       form.reset();
       positionInput.value = 'Standing';
+      subPositionToggle.checked = false;
       roleInput.value = 'Top';
       transitionFromSelect.value = '';
       legEntanglementSideInput.value = 'Backside';
