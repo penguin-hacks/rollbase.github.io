@@ -72,6 +72,11 @@
               <option value="Spider guard">Spider guard</option>
               <option value="Lasso guard">Lasso guard</option>
             </optgroup>
+            <optgroup label="Leg Entanglements">
+              <option value="Straight Ashi">Straight Ashi (SLX)</option>
+              <option value="Cross Ashi">Cross Ashi</option>
+              <option value="50/50">50/50</option>
+            </optgroup>
             <optgroup label="Advantageous Positions">
               <option value="Side control">Side control</option>
               <option value="Mount">Mount</option>
@@ -98,6 +103,13 @@
               <option value="">Select a move</option>
             </select>
           </div>
+        </div>
+        <div id="legEntanglementSideContainer" class="hidden">
+          <label class="block text-sm font-medium text-slate-300">Entanglement side</label>
+          <select id="legEntanglementSide" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none transition focus:border-sky-400">
+            <option value="Backside">Backside</option>
+            <option value="Frontside">Frontside</option>
+          </select>
         </div>
         <div id="giToggleContainer" class="mt-4 flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3">
           <span class="text-sm font-medium text-slate-300">Gi and Nogi</span>
@@ -126,6 +138,7 @@
               <option value="Standing">Standing</option>
               <option value="Guard sitting">Guard sitting</option>
               <option value="Guard standing">Guard standing</option>
+              <option value="Leg Entanglements">Leg Entanglements</option>
               <option value="Advantageous Positions">Advantageous Positions</option>
               <option value="Transitions">Transitions</option>
             </select>
@@ -337,6 +350,7 @@
     const positionInput = document.getElementById('movePosition');
     const roleInput = document.getElementById('moveRole');
     const transitionFromSelect = document.getElementById('transitionFrom');
+    const legEntanglementSideInput = document.getElementById('legEntanglementSide');
     const giOnlyToggle = document.getElementById('giOnlyToggle');
     const roleLabel = document.getElementById('roleLabel');
     const searchInput = document.getElementById('searchInput');
@@ -691,16 +705,23 @@
       'Standing': ['Standing'],
       'Guard sitting': ['Closed Guard', 'Open guard sitting', 'Half guard', 'Quarter guard', 'Butterfly guard', 'Half butterfly guard'],
       'Guard standing': ['Sitting guard', 'Delariva', 'SLX', 'X-guard', 'Spider guard', 'Lasso guard'],
+      'Leg Entanglements': ['Straight Ashi', 'Cross Ashi', '50/50'],
       'Advantageous Positions': ['Side control', 'Mount', 'Turtle (backside)', 'Turtle (frontside)', 'Turtle (side to side)', 'Back mount', 'Back mount (body triangle)', 'Knee on belly', 'Top Crucifix', 'Bottom Crucifix', 'Katagatame'],
       'Transitions': ['Transition']
     };
-    const allPositions = ['Standing', ...positionCategories['Guard sitting'], ...positionCategories['Guard standing'], ...positionCategories['Advantageous Positions'], ...positionCategories['Transitions']];
-    const categoryOrder = ['Standing', 'Guard sitting', 'Guard standing', 'Advantageous Positions'];
+    const allPositions = ['Standing', ...positionCategories['Guard sitting'], ...positionCategories['Guard standing'], ...positionCategories['Leg Entanglements'], ...positionCategories['Advantageous Positions'], ...positionCategories['Transitions']];
+    const categoryOrder = ['Standing', 'Guard sitting', 'Guard standing', 'Leg Entanglements', 'Advantageous Positions'];
     let currentCategory = 'All';
     let currentPosition = 'All';
     let searchTerm = '';
 
-    function isControllerReceiverPosition(position) {
+    function isLegEntanglementPosition(position) {
+      return positionCategories['Leg Entanglements'].includes(position);
+    }
+
+    function isControllerReceiverPosition(position, side = '') {
+      if (position === 'Straight Ashi' || position === 'Cross Ashi') return true;
+      if (position === '50/50') return side === 'Backside';
       return positionCategories['Advantageous Positions'].includes(position);
     }
 
@@ -740,17 +761,27 @@
       return move.position === currentPosition;
     }
 
-    function getRoleLabel(position) {
-      return isControllerReceiverPosition(position) ? 'Controller / Receiver' : 'Top or Bottom';
+    function getRoleLabel(position, side = '') {
+      return isControllerReceiverPosition(position, side) ? 'Controller / Receiver' : 'Top or Bottom';
     }
 
     function updateRoleLabel() {
-      const isTransition = positionInput.value === 'Transition';
-      const special = isControllerReceiverPosition(positionInput.value);
-      const showRole = positionInput.value !== 'Standing';
+      const position = positionInput.value;
+      const side = legEntanglementSideInput.value || 'Backside';
+      const isTransition = position === 'Transition';
+      const showSide = ['Cross Ashi', '50/50'].includes(position);
+      const sideContainer = document.getElementById('legEntanglementSideContainer');
+      sideContainer.classList.toggle('hidden', !showSide);
+      if (showSide && !legEntanglementSideInput.value) {
+        legEntanglementSideInput.value = 'Backside';
+      }
+      const special = isControllerReceiverPosition(position, side);
+      const showRole = position !== 'Standing' && !(position === '50/50' && side === 'Frontside');
       const roleInputs = document.getElementById('roleInputs');
       roleInputs.classList.toggle('hidden', !showRole);
       if (!showRole) {
+        roleInput.classList.add('hidden');
+        transitionFromSelect.classList.add('hidden');
         return;
       }
 
@@ -765,7 +796,7 @@
 
       roleInput.classList.remove('hidden');
       transitionFromSelect.classList.add('hidden');
-      roleLabel.textContent = getRoleLabel(positionInput.value);
+      roleLabel.textContent = getRoleLabel(position, side);
       if (special) {
         roleInput.innerHTML = '<option value="Controller">Controller</option><option value="Receiver">Receiver</option>';
         if (roleInput.value !== 'Controller' && roleInput.value !== 'Receiver') {
@@ -1114,7 +1145,7 @@
       updateUndoState();
     }
 
-    function getNewMove(title, position, role, transitionFromId, giOnly) {
+    function getNewMove(title, position, role, transitionFromId, giOnly, legEntanglementSide = '') {
       return {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         title,
@@ -1124,6 +1155,7 @@
         role,
         transitionFromId: transitionFromId || '',
         giOnly: Boolean(giOnly),
+        legEntanglementSide: ['Cross Ashi', '50/50'].includes(position) ? legEntanglementSide : '',
         origin: 'Modern BJJ',
         originOther: '',
         attempts: 0,
@@ -1138,26 +1170,29 @@
       let role = roleInput.value;
       const transitionFromId = position === 'Transition' ? transitionFromSelect.value : '';
       const giOnly = giOnlyToggle.checked;
+      const legEntanglementSide = ['Cross Ashi', '50/50'].includes(position) ? legEntanglementSideInput.value : '';
       if (!title) return;
       if (position === 'Transition' && !transitionFromId) return;
-      if (isControllerReceiverPosition(position) && ['Top', 'Bottom'].includes(role)) {
+      if (isControllerReceiverPosition(position, legEntanglementSide) && ['Top', 'Bottom'].includes(role)) {
         role = 'Controller';
       }
-      if (position === 'Transition') {
+      if (position === 'Transition' || (position === '50/50' && legEntanglementSide === 'Frontside')) {
         role = '';
       }
-      moves.unshift(getNewMove(title, position, role, transitionFromId, giOnly));
+      moves.unshift(getNewMove(title, position, role, transitionFromId, giOnly, legEntanglementSide));
       saveData();
       renderCards();
       form.reset();
       positionInput.value = 'Standing';
       roleInput.value = 'Top';
       transitionFromSelect.value = '';
+      legEntanglementSideInput.value = 'Backside';
       giOnlyToggle.checked = false;
       updateRoleLabel();
     });
 
     positionInput.addEventListener('change', updateRoleLabel);
+    legEntanglementSideInput.addEventListener('change', updateRoleLabel);
     filterCategorySelect.addEventListener('change', () => {
       currentCategory = filterCategorySelect.value;
       updateFilterPositions();
